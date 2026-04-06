@@ -500,4 +500,93 @@ app.delete('/api/categories/:id', requireAuth, async (req, res) => {
   }
 })
 
+// ── CALENDAR ──────────────────────────────────────────────────────────────────
+
+// Returns a long-lived calendar token (signed JWT, 1 year, calendar purpose only)
+app.get('/api/calendar/token', requireAuth, (req, res) => {
+  const token = jwt.sign(
+    { userId: req.user.userId, purpose: 'calendar' },
+    process.env.JWT_SECRET,
+    { expiresIn: '1y' }
+  )
+  return res.json({ token })
+})
+
+// ICS feed — authenticated via ?token= query param (calendar apps can't send headers)
+app.get('/api/calendar/feed', async (req, res) => {
+  const { token } = req.query
+  if (!token) return res.status(401).send('Missing token')
+
+  let userId
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET)
+    if (payload.purpose !== 'calendar') throw new Error('wrong purpose')
+    userId = payload.userId
+  } catch {
+    return res.status(401).send('Invalid or expired token')
+  }
+
+  try {
+    const tasks = await prisma.task.findMany({
+      where: { OR: [{ ownerId: userId }, { isShared: true }], dueDate: { not: null } },
+      select: { id: true, title: true, description: true, status: true, dueDate: true },
+      orderBy: { dueDate: 'asc' },
+    })
+
+    const STATUS_MAP = { TODO: 'NEEDS-ACTION', IN_PROGRESS: 'IN-PROCESS', DONE: 'COMPLETED' }
+
+    function icsDate(date) {
+      return new Date(date).toISOString().slice(0, 10).replace(/-/g, '')
+    }
+
+    function icsNow() {
+      return new Date().toISOString().replace(/[-:.]/g, '').slice(0, 15) + 'Z'
+    }
+
+    function escapeIcs(str) {
+      return (str || '').replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n')
+    }
+
+    const stamp = icsNow()
+
+    const events = tasks.map(task => {
+      const start = icsDate(task.dueDate)
+      const endDate = new Date(task.dueDate)
+      endDate.setUTCDate(endDate.getUTCDate() + 1)
+      const end = icsDate(endDate)
+
+      return [
+        'BEGIN:VEVENT',
+        `UID:task-${task.id}@organiser-app`,
+        `DTSTAMP:${stamp}`,
+        `DTSTART;VALUE=DATE:${start}`,
+        `DTEND;VALUE=DATE:${end}`,
+        `SUMMARY:${escapeIcs(task.title)}`,
+        task.description ? `DESCRIPTION:${escapeIcs(task.description)}` : null,
+        `STATUS:${STATUS_MAP[task.status] || 'NEEDS-ACTION'}`,
+        'END:VEVENT',
+      ].filter(Boolean).join('\r\n')
+    })
+
+    const ics = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Organiser App//EN',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+      'X-WR-CALNAME:My Tasks',
+      'X-WR-CALDESC:Tasks with due dates from Organiser App',
+      ...events,
+      'END:VCALENDAR',
+    ].join('\r\n')
+
+    res.setHeader('Content-Type', 'text/calendar; charset=utf-8')
+    res.setHeader('Content-Disposition', 'inline; filename="tasks.ics"')
+    return res.send(ics)
+  } catch (err) {
+    console.error('[GET /calendar/feed]', err)
+    return res.status(500).send('Internal server error')
+  }
+})
+
 export default app

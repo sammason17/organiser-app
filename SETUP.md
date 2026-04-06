@@ -97,6 +97,20 @@ Login and register endpoints are rate-limited to **10 requests per IP per 15 min
 
 ---
 
+### Apple Calendar / ICS feed
+
+Each user can subscribe to a live ICS feed of their tasks (tasks with due dates only). To set it up:
+
+1. Go to **Settings** in the app
+2. Click **Get calendar link**
+3. Click **Subscribe in Apple Calendar** — iOS/macOS will prompt to confirm
+
+The feed URL uses a signed, long-lived token (1 year). Tasks appear as all-day events on their due date. Apple Calendar refreshes the feed roughly every hour; you can also pull to refresh manually.
+
+The feed works with any ICS-compatible calendar app (Apple Calendar, Google Calendar, Outlook).
+
+---
+
 ## API Summary
 
 | Method | Endpoint | Auth | Description |
@@ -114,3 +128,7 @@ Login and register endpoints are rate-limited to **10 requests per IP per 15 min
 | GET/PUT/DELETE | /api/projects/:id | Yes | Manage project |
 | GET/POST | /api/categories | Yes | List / create categories |
 | PUT/DELETE | /api/categories/:id | Yes | Manage category |
+| GET | /api/calendar/token | Yes | Generate a calendar feed token |
+| GET | /api/calendar/feed?token= | No* | ICS feed for calendar apps |
+
+*The calendar feed uses a signed token in the query string instead of a Bearer header, as calendar apps cannot send custom headers.
