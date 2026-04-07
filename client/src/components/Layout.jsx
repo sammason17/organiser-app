@@ -22,8 +22,8 @@ export default function Layout() {
       {/* Sidebar — desktop only */}
       <aside className="hidden md:flex w-56 flex-shrink-0 bg-white border-r border-gray-200 flex-col">
         {/* Logo */}
-        <div className="h-16 flex items-center px-5 border-b border-gray-100">
-          <span className="text-primary-600 font-bold text-lg tracking-tight">Organiser</span>
+        <div className="h-16 flex items-center px-4 border-b border-gray-100">
+          <img src="/logo.png" alt="My Life OS" className="h-10 w-auto object-contain" />
         </div>
 
         {/* Nav */}
