@@ -31,7 +31,7 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <img src="/logo.png" alt="My Life OS" className="h-16 w-auto object-contain mx-auto mb-3" />
+          <img src="/logo.png" alt="Corganiser" className="h-16 w-auto object-contain mx-auto mb-3" />
           <p className="mt-1 text-sm text-gray-500">Create your account</p>
         </div>
 
