@@ -6,6 +6,7 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { PrismaClient } from '@prisma/client'
 import workoutRouter from './workout.js'
+import debtRouter from './debt.js'
 
 // ── Prisma ────────────────────────────────────────────────────────────────────
 const prisma = global.prisma ?? new PrismaClient()
@@ -70,6 +71,7 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 app.use('/api/workout', workoutRouter)
+app.use('/api/debt', debtRouter)
 
 // ── Rate limiting ─────────────────────────────────────────────────────────────
 // Limits brute-force attempts on public auth endpoints.

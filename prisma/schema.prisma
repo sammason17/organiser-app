@@ -28,6 +28,9 @@ model User {
   bodyAreas          BodyArea[]         @relation("UserBodyAreas")
   workoutPlans       WorkoutPlan[]      @relation("UserWorkoutPlans")
 
+  // DebtFlow module
+  debtCards          DebtCard[]         @relation("UserDebtCards")
+
   @@map("users")
 }
 
@@ -255,4 +258,35 @@ model WorkoutDayExercise {
   exercise Exercise   @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
 
   @@map("workout_day_exercises")
+}
+
+// ── DebtFlow module ────────────────────────────────────────────────────────────
+
+model DebtCard {
+  id             String   @id @default(cuid())
+  name           String
+  totalDebt      Float    @map("total_debt")
+  apr            Float
+  monthlyPayment Float    @map("monthly_payment")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  ownerId String @map("owner_id")
+  owner   User   @relation("UserDebtCards", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  balanceTransfers BalanceTransfer[]
+
+  @@map("debt_cards")
+}
+
+model BalanceTransfer {
+  id              String   @id @default(cuid())
+  amount          Float
+  expiresInMonths Int      @map("expires_in_months")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  cardId String @map("card_id")
+  card   DebtCard @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@map("balance_transfers")
 }
