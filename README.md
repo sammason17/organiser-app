@@ -30,6 +30,11 @@ A personal life organiser built with React, Node/Express, and PostgreSQL (Neon).
 - **Active Workout** — work through exercises sequentially; view last session values as reference; enter actual sets/reps/weight; rest timer (with audio beep) between exercises
 - Last-session values stored per exercise — no history bloat
 
+### Debt Calculator
+- Add and manage credit cards and loans with total balances, APR, and monthly payments
+- Track promotional 0% balance transfers, including remaining duration in months
+- All debt data is private and strictly scoped to the authenticated user
+
 ## Local Development
 
 ```bash
@@ -104,5 +109,11 @@ Frontend runs at `http://localhost:5173`, API at `http://localhost:3001`.
 | GET/PUT/DELETE | `/api/workout/plans/:id` | Manage a plan |
 | PATCH | `/api/workout/plans/:id/activate` | Set as active plan |
 | PATCH | `/api/workout/day-exercises/:id/complete` | Record exercise completion (saves last sets/reps/weight) |
+
+### Debt Calculator
+| Method | Endpoint | Description |
+|---|---|---|
+| GET/POST | `/api/debt/cards` | List / create debt cards (with balance transfers) |
+| PUT/DELETE | `/api/debt/cards/:id` | Manage a debt card |
 
 All endpoints except register, login, and the calendar feed require an `Authorization: Bearer <token>` header.
