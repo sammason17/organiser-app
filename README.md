@@ -32,6 +32,7 @@ A personal life organiser built with React, Node/Express, and PostgreSQL (Neon).
 
 ### Debt Calculator
 - Add and manage credit cards and loans with total balances, APR, and monthly payments
+- View portfolio-level summaries including combined debt, interest liability, and total monthly payments
 - Track promotional 0% balance transfers, including exact expiration dates and post-offer payment increases
 - Set specific monthly payment dates for accurate, date-based payoff simulations
 - Edit existing debt entries to accommodate variable interest rates and changing terms

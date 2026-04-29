@@ -251,6 +251,10 @@ export default function DebtFlowPage() {
     cards.reduce((sum, c) => sum + c.totalDebt, 0),
   [cards]);
 
+  const totalMonthlyPayments = useMemo(() => 
+    cards.reduce((sum, c) => sum + (Number(c.monthlyPayment) || 0), 0),
+  [cards]);
+
   if (loading) return <div className="p-8 text-center text-slate-500">Loading portfolio...</div>;
 
   return (
@@ -291,6 +295,13 @@ export default function DebtFlowPage() {
                   Interest Liability
                 </p>
                 <p className="text-xl font-bold tracking-tight text-emerald-700">{formatCurrency(totalCalculatedInterest)}</p>
+              </div>
+              <div className="p-4 bg-indigo-50 rounded-2xl border border-indigo-100 transition-all hover:bg-indigo-100/50">
+                <p className="text-xs text-indigo-600 font-medium mb-1 flex items-center gap-1.5 uppercase">
+                  <Calendar size={12} className="text-indigo-500" />
+                  Total Monthly Payments
+                </p>
+                <p className="text-xl font-bold tracking-tight text-indigo-700">{formatCurrency(totalMonthlyPayments)}</p>
               </div>
             </div>
           </div>
